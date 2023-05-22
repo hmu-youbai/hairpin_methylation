@@ -19,7 +19,6 @@ def process_file(bam_file):
         if read.is_unmapped:
             continue
         name=read.query_name
-        mylist=[]
 
         aligned_pairs = read.get_aligned_pairs(with_seq=True, matches_only=False)
         mylist = [pair[2] for pair in aligned_pairs if pair[0] is not None]
@@ -33,16 +32,6 @@ def process_file(bam_file):
         print(mystr,file=hmc_bed)
     sam.close()
     hmc_bed.close()
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -71,8 +60,6 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-
-
     process_file(args.sam)
 
     cc = {}

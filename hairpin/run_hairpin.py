@@ -1,11 +1,10 @@
 import argparse
-import multiprocessing
 
-from align import Alignment
-from test import cache_and_process
-from trim import deduplication
-from log import get_lengths
-from log import cover_for_log
+from hairpin.align import Alignment
+from hairpin.parallel import cache_and_process
+from hairpin.trim import deduplication
+from hairpin.log import get_lengths
+from hairpin.log import cover_for_log
 import subprocess
 import os
 
@@ -31,7 +30,7 @@ def main():
     parser.add_argument(
         "--rule",
         help="Choose a rule for sequence alignment: 1 or 2. Default: 1",
-        default="1",
+        default="2",
         choices=["1", "2"],
         type=str,
     )
@@ -143,8 +142,8 @@ def main():
                  "mc标品测序深度为: " + str(my_mc) + "\n"
 
     mylog = mylog +"\n" +mylog_len
-    hmc_cmd=f"python3 /data/wangzc/demo/3333.py  --sam {args.output}.sam "
-    mc_cmd=f"python3 /data/wangzc/demo/get_mc.py  --sam {args.output}.sam  --cutfq1 {args.output[:-2]}cut_f1.fq"
+    hmc_cmd=f"hmc_extractor  --sam {args.output}.sam "
+    mc_cmd=f"mc_extractor  --sam {args.output}.sam  --cutfq1 {args.output[:-2]}cut_f1.fq"
     subprocess.run(hmc_cmd, shell=True)
     subprocess.run(mc_cmd, shell=True)
 

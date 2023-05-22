@@ -1,10 +1,13 @@
 import argparse
-from align import Alignment
-from test import cache_and_process
-from trim import deduplication
-from log import get_lengths
+
+from hairpin.align import Alignment
+from hairpin.parallel import cache_and_process
+from hairpin.trim import deduplication
+from hairpin.log import get_lengths
+from hairpin.log import cover_for_log
 import subprocess
 import os
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -27,7 +30,7 @@ def main():
     parser.add_argument(
         "--rule",
         help="Choose a rule for sequence alignment: 1 or 2. Default: 1",
-        default="1",
+        default="2",
         choices=["1", "2"],
         type=str,
     )
@@ -74,8 +77,22 @@ def main():
         type=int,
     )
 
+    parser.add_argument(
+        "--bowtie2_ref",
+        help="get log",
+        default="/data/wangzc/cgs/mc/mm9",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--BAMStats",
+        help="get log",
+        default="/data/wangzc/soft/BAMStats-1.25/BAMStats-1.25.jar",
+        type=str,
+    )
+
     args = parser.parse_args()
-    
+
     if args.output is None:
         output_dir = os.path.dirname(args.fq1)
         args.output = os.path.join(output_dir, 'restored_seq.fq')
@@ -99,10 +116,44 @@ def main():
         if args.rm_temp == 1:
             cmd = ["rm", uniq_read1, uniq_read2]
             subprocess.call(cmd)
-    mylog=mylog+"\n"+get_lengths(args.output)
+    mylog = mylog +"\n"+ get_lengths(args.output)
+
+
+    bowtie2_cmd = f"bowtie2 -x  {args.bowtie2_ref} -U {args.output} -S {args.output}.sam -p {args.parallel}"
+    mylog_bowtie2 = subprocess.run(bowtie2_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    mylog = mylog + "\n" + mylog_bowtie2.stdout.decode('utf-8')
+    mylog = mylog + "\n" + mylog_bowtie2.stderr.decode('utf-8')
+
+
+    bam_cmd = f"samtools view  -b {args.output}.sam > {args.output}.bam"
+    sort_cmd= f"samtools sort {args.output}.bam > {args.output}.sort"
+    index_cmd= f"samtools index  {args.output}.sort"
+    cover_cmd= f"java -jar -Xmx100g {args.BAMStats} -m -i {args.output}.sort -o {args.output}.BAMStats --view simple"
+    subprocess.run(bam_cmd, shell=True)
+    subprocess.run(sort_cmd, shell=True)
+    subprocess.run(index_cmd, shell=True)
+    subprocess.run(cover_cmd, shell=True)
+    cover, lambda_cover, mc_cover, dep, my_lambda, my_mc = cover_for_log(args.output+".BAMStats")
+    mylog_len="基因组覆盖度为: " + str(cover) + "\n" + \
+                 "lambda cover: " + str(lambda_cover) + "\n" + \
+                 "full mc 标品 cover: " + str(mc_cover) + "\n" + \
+                 "平均测序深度为: " + str(dep) + "\n" + \
+                 "lambda测序深度为: " + str(my_lambda) + "\n" + \
+                 "mc标品测序深度为: " + str(my_mc) + "\n"
+
+    mylog = mylog +"\n" +mylog_len
+    hmc_cmd=f"hmc_extractor  --sam {args.output}.sam "
+    mc_cmd=f"mc_extractor  --sam {args.output}.sam  --cutfq1 {args.output[:-2]}cut_f1.fq"
+    subprocess.run(hmc_cmd, shell=True)
+    subprocess.run(mc_cmd, shell=True)
+
+
+
+
     if args.log == 1:
         with open(args.fq1.rsplit(".", 1)[0] + ".log", "w") as file:
             print(mylog, file=file)
+
 
 
 

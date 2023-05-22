@@ -2,6 +2,11 @@ import Levenshtein
 import gzip
 from collections import namedtuple
 
+def reverse_complement(dna):
+    complement = str.maketrans('ATCG', 'TAGC')
+    reverse = dna[::-1].translate(complement)
+    return reverse
+
 def complement_dna(sequence):
     """
     Returns the complementary sequence of a given DNA sequence.
@@ -78,7 +83,7 @@ def deduplication(input_file1, input_file2):
     de_seq = {}
     if input_file1.endswith('.gz'):
         in_handle = gzip.open(input_file1, "rt")
-        out1=input_file1[:-3]+".uniq"
+        out1 = input_file1[:-3] + ".uniq"
     else:
         in_handle = open(input_file1)
         out1 = input_file1 + ".uniq"
@@ -109,4 +114,4 @@ def deduplication(input_file1, input_file2):
             print(seq.split()[1], file=outfile2)
             print("+", file=outfile2)
             print(de_seq[seq].qual.split()[1], file=outfile2)
-    return out1,out2,int((line_num+1)/4)
+    return out1, out2, int((line_num + 1) / 4)
