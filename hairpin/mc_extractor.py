@@ -1,5 +1,7 @@
 import multiprocessing
 import argparse
+from functools import partial
+
 import pysam
 import collections
 import subprocess
@@ -65,7 +67,7 @@ def split_sam_file(sam_file, num_parts):
 
 
 
-def process_file(bam_file):
+def process_file(bam_file,dd,ss):
     sam = pysam.AlignmentFile(bam_file, "r")
     hmc_bed = open(bam_file + ".bed", "w")
     for read in sam.fetch():
@@ -187,10 +189,7 @@ def final_bed(hmc_bed):
             fout.write(f"{chrom}\t{start}\t{start}\t{meth_ratio:.2f}\t{meth_counts}\t{unmeth_counts}\t{hmc_type}\n")
 
 
-def process_chunk_chr(chunk):
-    output_filename = args.sam+"." + chunk + ".bed"
-    cmd = f"awk '$1==\"{chunk}\"' {output_file} > {output_filename}"
-    subprocess.run(cmd, shell=True)
+
 
 
 
@@ -203,7 +202,7 @@ def run_command(command):
     return stdout.decode()
 
 
-def count_ccc(seq_name):
+def count_ccc(seq_name,dd):
         seq = dd[seq_name]
         CpG_num = 0
         CHG_num = 0
@@ -228,7 +227,7 @@ def count_ccc(seq_name):
         return [CpG_num, CHG_num, CHH_num, CN_num]
 
 
-def count_ggg(seq_name):
+def count_ggg(seq_name,dd):
     seq = dd[seq_name]
     CpG_num = 0
     CHG_num = 0
@@ -252,8 +251,12 @@ def count_ggg(seq_name):
                 CHH_num = CHH_num + 1
     return [CpG_num, CHG_num, CHH_num, CN_num]
 
+def process_chunk_chr(chunk,args,output_file):
+    output_filename = args.sam + "." + chunk + ".bed"
+    cmd = f"awk '$1==\"{chunk}\"' {output_file} > {output_filename}"
+    subprocess.run(cmd, shell=True)
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -305,7 +308,9 @@ if __name__ == '__main__':
         pool.map(index_file, input_split_files)
 
     with multiprocessing.Pool(processes=args.parallel) as pool:
-        pool.map(process_file, sort_file)
+        partial_process_file = partial(process_file, dd=dd,ss=ss)
+        pool.map(partial_process_file, sort_file)
+
 
 
     #逐条提取已经结束，剩下全是整理合并
@@ -325,7 +330,9 @@ if __name__ == '__main__':
     chunks_chr = [key for key in dd.keys()]
 
     with multiprocessing.Pool(processes=args.parallel) as pool:
-        pool.map(process_chunk_chr, chunks_chr)
+        partial_process_chunk_chr = partial(process_chunk_chr, args=args,output_file=output_file)
+        pool.map(partial_process_chunk_chr, chunks_chr)
+
 
     delete_command = f"rm -rf {output_file}"
     subprocess.run(delete_command, shell=True)
@@ -358,8 +365,13 @@ if __name__ == '__main__':
                 f"awk '$7==\"CN\"{{sum4+=$4; sum5+=$5; sum6+=$6; cnt_cn++}} END {{print cnt_cn==0 ? 0 : sum4/cnt_cn, sum5, sum6, cnt_cn}}' {args.output}",
         ]
 
-        ccc = pool.map(count_ccc, chunks_chr)
-        ggg = pool.map(count_ggg, chunks_chr)
+
+        partial_count_ccc = partial(count_ccc, dd=dd)
+        ccc = pool.map( partial_count_ccc, chunks_chr)
+
+        partial_count_ggg = partial(count_ggg, dd=dd)
+        ggg = pool.map(partial_count_ggg, chunks_chr)
+
         results = pool.map(run_command, commands)
 
     ccc_CpG=ccc_CHG=ccc_CHH=ccc_CN=0
@@ -396,7 +408,8 @@ if __name__ == '__main__':
 
 
 
-
+if __name__ == '__main__':
+    main()
 
 
 

@@ -2,7 +2,7 @@ import gzip
 import math
 from collections import namedtuple
 import multiprocessing
-from trim import trim_overlap
+from hairpin.trim import trim_overlap
 from functools import partial
 import os
 
