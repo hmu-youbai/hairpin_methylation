@@ -39,7 +39,7 @@ ps:建议在conda虚拟环境下安装
    ```bash
    run_hairpin --fq1 yourfq1.fq.gz --fq2 yourfq2.fq.gz --parallel 20 --duplication 1
     ```
-   [^1]: run_hairpin命令会执行全部操作：cut，提取hmc，提取mc，并生成log文件
+   - run_hairpin命令会执行全部操作：cut，提取hmc，提取mc，并生成log文件
 
 
 1. 切割原始fq1和fq2，并生成3个文件：①还原到BS之前的stem 5\` \- 3` 的fq文件，②仅切割stem的fq1，③仅切割stem的fq2
