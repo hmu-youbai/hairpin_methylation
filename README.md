@@ -31,4 +31,12 @@ ps:建议在conda虚拟环境下安装
    ```
    注意：确保你的系统已经安装了所需的依赖包。
 
+
 ## 使用 
+1. 切割原始fq1和fq2，并生成3个文件：①还原到BS之前的stem 5`-3`的fq文件，②仅切割stem的fq1，③仅切割stem的fq2
+
+   ```bash
+   git clone https://github.com/hmu-youbai/hairpin_methylation.git
+    ```
+   
+   如果网络问题无法完成克隆，可以直接下载.zip压缩包，自行解压
