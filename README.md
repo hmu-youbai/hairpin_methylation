@@ -48,9 +48,9 @@ ps:建议在conda虚拟环境下安装
    hairpin_cut --fq1 yourfq1.fq.gz --fq2 yourfq2.fq.gz --parallel 20 --duplication 1
     ```
    
-   如果已经自行完成去重，可以删除duplication选项/n
-   parallel选项设置进程数，当文件过大时（超过50g），建议设置5，避免内存溢出/n
-   默认模式为填充普通C，如果填充mC请设置--rule 1
+   - 如果已经自行完成去重，可以删除duplication选项
+   - parallel选项设置进程数，当文件过大时（超过50g），建议设置5，避免内存溢出
+   - 默认模式为填充普通C，如果填充mC请设置--rule 1
 
 
 2. ①文件比对得到的sam文件提取hmc：
