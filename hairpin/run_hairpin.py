@@ -142,8 +142,8 @@ def main():
                  "mc标品测序深度为: " + str(my_mc) + "\n"
 
     mylog = mylog +"\n" +mylog_len
-    hmc_cmd=f"hmc_extractor  --sam {args.output}.sam "
-    mc_cmd=f"mc_extractor  --sam {args.output}.sam  --cutfq1 {args.output[:-2]}cut_f1.fq"
+    hmc_cmd=f"hmc_extractor  --sam {args.output}.sam --parallel {args.parallel}"
+    mc_cmd=f"mc_extractor  --sam {args.output}.sam  --cutfq1 {args.output[:-2]}cut_f1.fq  --parallel {args.parallel}"
     subprocess.run(hmc_cmd, shell=True)
     subprocess.run(mc_cmd, shell=True)
 
