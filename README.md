@@ -26,7 +26,7 @@ ps:建议在conda虚拟环境下安装
   ```bash
    python setup.py build
    ```
-   ```bash
+  ```bash
    python setup.py install
    ```
 注意：确保你的系统已经安装了所需的依赖包。我的格式很奇怪，能帮我改改吗
