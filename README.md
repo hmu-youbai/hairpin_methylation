@@ -56,12 +56,12 @@ ps:建议在conda虚拟环境下安装
  
    ```bash
    hmc_extractor --sam restored_seq.fq.sam --parallel 20
-   ```
+    ```
   
 
 3. ①文件比对得到的sam文件提取mc：
  
    ```bash
    mc_extractor --sam restored_seq.fq.sam  --cutfq1 restored_seq.cut_f1.fq --parallel 20
-   ```
+    ```
 
