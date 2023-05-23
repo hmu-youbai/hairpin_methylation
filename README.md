@@ -14,7 +14,7 @@ ps:建议在conda虚拟环境下安装
    git clone https://github.com/hmu-youbai/hairpin_methylation.git
     ```
    
-如果网络问题无法完成克隆，可以直接下载.zip压缩包，自行解压
+   如果网络问题无法完成克隆，可以直接下载.zip压缩包，自行解压
    
 2. 进入项目目录：
  
@@ -29,5 +29,5 @@ ps:建议在conda虚拟环境下安装
    ```bash
    python setup.py install
    ```
-注意：确保你的系统已经安装了所需的依赖包。我的格式很奇怪，能帮我改改吗
+   注意：确保你的系统已经安装了所需的依赖包。我的格式很奇怪，能帮我改改吗
 
