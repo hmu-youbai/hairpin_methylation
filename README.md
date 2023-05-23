@@ -25,7 +25,8 @@ ps:建议在conda虚拟环境下安装
   ```bash
    cd hairpin_methylation
    
-3.运行安装命令：
+   
+3. 运行安装命令：
   ```bash
    python setup.py build
    python setup.py install
