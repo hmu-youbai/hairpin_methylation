@@ -1,5 +1,5 @@
 # hairpin_methylation
-实现cut fq1和fq2，同时可以提取hmc和mc，内侧版本。
+实现cut fq1和fq2，同时可以提取hmc和mc，内测版本。
 
 cai_club
 
