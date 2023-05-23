@@ -42,14 +42,14 @@ ps:建议在conda虚拟环境下安装
    run_hairpin命令会执行全部操作：cut，提取hmc，提取mc，并生成log文件
 
 
-1. 切割原始fq1和fq2，并生成3个文件：①还原到BS之前的stem 5\` \-3` 的fq文件，②仅切割stem的fq1，③仅切割stem的fq2
+1. 切割原始fq1和fq2，并生成3个文件：①还原到BS之前的stem 5\` \- 3` 的fq文件，②仅切割stem的fq1，③仅切割stem的fq2
 
    ```bash
    hairpin_cut --fq1 yourfq1.fq.gz --fq2 yourfq2.fq.gz --parallel 20 --duplication 1
     ```
    
-   如果已经自行完成去重，可以删除duplication选项
-   parallel选项设置进程数，当文件过大时（超过50g），建议设置5，避免内存溢出
+   如果已经自行完成去重，可以删除duplication选项\n
+   parallel选项设置进程数，当文件过大时（超过50g），建议设置5，避免内存溢出\n
    默认模式为填充普通C，如果填充mC请设置--rule 1
 
 
