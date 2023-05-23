@@ -34,7 +34,7 @@ ps:建议在conda虚拟环境下安装
 
 ## 使用 
 
-1.cai_club内部命令
+0. cai_club内部命令
 
    ```bash
    run_hairpin --fq1 yourfq1.fq.gz --fq2 yourfq2.fq.gz --parallel 20 --duplication 1
