@@ -14,4 +14,4 @@ Just for test and Processing simple data
 1. 克隆代码库到本地：
 
    ```bash
-   git clone https://github.com/your/repository.git
+   git clone https://github.com/hmu-youbai/hairpin_methylation.git
