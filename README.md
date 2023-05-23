@@ -18,15 +18,15 @@ ps:建议在conda虚拟环境下安装
    
 2. 进入项目目录：
  
-  ```bash
+   ```bash
    cd hairpin_methylation
    ```
 3. 运行安装命令：   
 
-  ```bash
+   ```bash
    python setup.py build
    ```
-  ```bash
+   ```bash
    python setup.py install
    ```
 注意：确保你的系统已经安装了所需的依赖包。我的格式很奇怪，能帮我改改吗
