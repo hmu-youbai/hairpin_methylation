@@ -341,13 +341,7 @@ def main():
 
 
 
-    with multiprocessing.Pool(processes=args.parallel) as pool:
-        commands = [f"awk '$7==\"CpG\"{{sum4+=$4; sum5+=$5; sum6+=$6; cnt_cpg++}} END {{print cnt_cpg==0 ? 0 : sum4/cnt_cpg, sum5, sum6, cnt_cpg}}' {args.output}",
-                f"awk '$7==\"CHG\"{{sum4+=$4; sum5+=$5; sum6+=$6; cnt_chg++}} END {{print cnt_chg==0 ? 0 : sum4/cnt_chg, sum5, sum6, cnt_chg}}' {args.output}",
-                f"awk '$7==\"CHH\"{{sum4+=$4; sum5+=$5; sum6+=$6; cnt_chh++}} END {{print cnt_chh==0 ? 0 : sum4/cnt_chh, sum5, sum6, cnt_chh}}' {args.output}",
-                f"awk '$7==\"CN\"{{sum4+=$4; sum5+=$5; sum6+=$6; cnt_cn++}} END {{print cnt_cn==0 ? 0 : sum4/cnt_cn, sum5, sum6, cnt_cn}}' {args.output}",
-        ]
-        results = pool.map(run_command, commands)
+
 
     partial_count_ccc = partial(count_ccc, dd=dd, args=args)
     ppp(partial_count_ccc, chunks_chr, args)
@@ -362,23 +356,9 @@ def main():
             ccc_CHH = ccc_CHH + int(line[2])
             ccc_CN = ccc_CN + int(line[3])
 
-    print(results)
+    from log import calculate_statistics
+    calculate_statistics(args.output,ccc_CpG,ccc_CHG,ccc_CHH,"mc",args)
 
-    result_cpg = int(results[0].strip().split()[3]) / ccc_CpG * 100
-    result_cpg = round(result_cpg, 2)
-
-    result_chg = int(results[1].strip().split()[3]) / ccc_CHG * 100
-    result_chg = round(result_chg, 2)
-
-    result_chh = int(results[2].strip().split()[3]) / ccc_CHH * 100
-    result_chh = round(result_chh, 2)
-
-    with open(args.output+".log","w")as file:
-        print(f"CpG mc平均水平：{results[0].split()[0]} ref总CpG位点：{ccc_CpG} 测序覆盖到的CpG位点数：{results[0].strip().split()[3]} ({result_cpg}) modC总数量：{results[0].split()[1]} unmodC总数量：{results[0].split()[2]}",file=file)
-        print(f"CHG mc平均水平：{results[1].split()[0]} ref总CHG位点：{ccc_CHG} 测序覆盖到的CHG位点数：{results[1].strip().split()[3]} ({result_chg}) modC总数量：{results[1].split()[1]} unmodC总数量：{results[1].split()[2]}",file=file)
-        print(f"CHH mc平均水平：{results[2].split()[0]} ref总CHH位点：{ccc_CHH} 测序覆盖到的CHH位点数：{results[2].strip().split()[3]} ({result_chh}) modC总数量：{results[2].split()[1]} unmodC总数量：{results[2].split()[2]}",file=file)
-        if float(results[3].split()[0]) != 0:
-            print(f"CN mc平均水平：{results[3].split()[0]}   modC总数量：{results[3].strip().split()[1]} unmodC总数量：{results[3].split()[2]}",file=file)
 
 
 
