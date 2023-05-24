@@ -323,7 +323,7 @@ def main():
             ccc_CHH = ccc_CHH + int(line[2])
             ccc_CN = ccc_CN + int(line[3])
 
-    from log import calculate_statistics
+    from hairpin.log import calculate_statistics
     calculate_statistics(args.output,ccc_CpG,ccc_CHG,ccc_CHH,"hmc",args)
 
 
