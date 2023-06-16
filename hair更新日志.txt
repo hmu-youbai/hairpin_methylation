@@ -1,0 +1,39 @@
+align.py    √   不依赖其他文件，提供比对需要的全局比对矩阵和函数  依赖：Bio numpy
+trim.py    √    不依赖其他文件,  提供DNA反向互补，去重，去overlap， 依赖：gzip Levenshtein collections
+log.py    √      不依赖其他文件,   提供统计长度的log，基因组/lambda/mc的cover，依赖numpy pandas Bio
+parallel.py 原test.py 依赖hairpin.trim   提供cut（处理质量值）有待修改，              多进程，多内存处理cut函数     依赖gzip math collections multiprocessing functools os
+
+
+hairpin_cut.py 原test_cut.py  依赖以上四个，提供cut所需的参数，默认rule 2 ，duplication 0 ，        依赖argparse subprocess os
+
+
+hmc_extractor_.py 原3333.py  不依赖其他文件  提供提去从sam文件提取hmc            依赖multiprocessing  argparse pysam collections subprocess Bio
+mc_extractor_.py  原get_mc.py  不依赖其他文件  提供提去从sam文件提取mc, 需要提供cutfq1            依赖multiprocessing  argparse pysam subprocess Bio
+ 
+
+
+run_hairpin.py 原test_all  依赖同hairpin_cut.py      提供dup+cut+bowtie2+samcover+hmc+mc    依赖argparse subprocess os
+
+
+     
+AlignCheck.py 原bl.py 不进行改动  不依赖其他文件
+ 
+mc_bismark.py 不进行改动   不依赖其他文件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+awk '{ print $1"\t"$2"\t"$2+1"\tid-"NR"\t"$4; }' e18.caps.new  | sort-bed - > input.bed
+bedops --chop 1000  hg38.bounds.bed | bedmap --faster --echo --mean --delim "\t" --skip-unmapped - input.bed > final_no_stagger.bed
+bedGraphToBigWig final_no_stagger.bed chrom_sizes.txt final.bw
