@@ -25,7 +25,9 @@ mc_bismark.py 不进行改动   不依赖其他文件
 
 
 
-
+#########
+修复了一个bug，在统计非hmc/mc位点时，仅考虑ref=c，seq=c  或 ref=c，sep=t，其他情况不计入
+已知bug，在现有模式下，不做caps时，hmc的sep=t会被记入
 
 
 
