@@ -42,7 +42,7 @@ def process_file(bam_file,dd,ss):
                         print(get_pos + str(1) + " " + "CN", file=hmc_bed)
                     else:
                         print(get_pos + str(1) + " " + "CHH", file=hmc_bed)
-                elif seq[query_pos] == "G" and cut_seq[query_pos] == "A" and ref_base == "G":
+                elif (seq[query_pos] == "G" and ref_base == "G") or (seq[query_pos] == "A" and ref_base == "g"):
                     get_pos = read.reference_name + " " + str(ref_pos + 1) + " " + str(ref_pos + 1) + " "
                     if ref_pos == 0:
                         print(get_pos + str(0) + " " + "CN", file=hmc_bed)
@@ -78,7 +78,7 @@ def process_file(bam_file,dd,ss):
                         print(get_pos + str(1) + " " + "CN", file=hmc_bed)
                     else:
                         print(get_pos + str(1) + " " + "CHH", file=hmc_bed)
-                elif seq[query_pos] == "C" and cut_seq[query_pos] == "T" and ref_base == "C":
+                elif (seq[query_pos] == "C" and ref_base == "C") or (seq[query_pos] == "T" and ref_base == "c"):
                     get_pos = read.reference_name + " " + str(ref_pos + 1) + " " + str(ref_pos + 1) + " "
                     if ref_pos == len(dd[read.reference_name])-1:
                         print(get_pos + str(0) + " " + "CN", file=hmc_bed)
