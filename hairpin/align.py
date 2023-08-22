@@ -20,7 +20,7 @@ class Alignment:
         [0.0, 0.0, 0.0, 0.0, 0.0]
     ])
 
-    def __init__(self, sub_matrix, mode='global', open_gap_score=-5, extend_gap_score=-2):
+    def __init__(self, sub_matrix, mode='global', open_gap_score=-3, extend_gap_score=-2):
         aligner = PairwiseAligner()
         aligner.mode = mode
         aligner.open_gap_score = open_gap_score
