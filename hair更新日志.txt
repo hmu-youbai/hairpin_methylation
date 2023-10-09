@@ -1,3 +1,11 @@
+# 20231009更新
+注意到，class Alignment，在align时，-会优先靠前出现（同分值时），在snk版本通过两个reverse矫正，这里没做修改
+
+
+
+
+
+
 align.py    √   不依赖其他文件，提供比对需要的全局比对矩阵和函数  依赖：Bio numpy
 trim.py    √    不依赖其他文件,  提供DNA反向互补，去重，去overlap， 依赖：gzip Levenshtein collections
 log.py    √      不依赖其他文件,   提供统计长度的log，基因组/lambda/mc的cover，依赖numpy pandas Bio
