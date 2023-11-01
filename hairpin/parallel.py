@@ -9,11 +9,45 @@ import os
 Record = namedtuple('Record', ['name', 'seq', 'qual', 'seq1', 'seq2'])
 
 
-def cut(read, qual):
-    half_len = len(read)
-    if half_len > len(qual):
-        qual += 'I' * (half_len - len(qual))
-    return qual[:half_len]
+
+def correct_seq(seq, seq1, seq2, qual):
+    q1=qual.split()[0]
+    q2=qual.split()[1]
+
+    temp_result = []
+    temp = 0
+    for char in seq1:
+        if char == "-":
+            temp_result.append(",")
+        else:
+            temp_result.append(q1[temp])
+            temp += 1
+    str_q1 = "".join(temp_result)
+
+    temp_result = []
+    temp = 0
+    for char in seq2:
+        if char == "-":
+            temp_result.append(",")
+        else:
+            temp_result.append(q2[temp])
+            temp += 1
+    str_q2 = "".join(temp_result)
+
+    # 可选部分，通过质量比较纠正seq
+    c_qq=[]
+    result_seq=list(seq)
+    for index,char in enumerate(seq):
+        if char=="N":
+            c_qq.append(",")
+            if str_q1[index]>str_q2[index] and seq1!="-" and seq1!="T":
+                result_seq[index] = seq1[index]
+            elif str_q2[index]>str_q1[index] and seq2!="-" and seq2!="A":
+                result_seq[index] = seq2[index]
+        else:
+            c_qq.append(max(str_q1[index],str_q2[index]))
+    c_qq = "".join(c_qq)
+    return "".join(result_seq), c_qq+" "+str_q1+" "+str_q2
 
 
 def process_chunk(chunks, alignment, min_lenth=50):
@@ -23,10 +57,10 @@ def process_chunk(chunks, alignment, min_lenth=50):
         seq, seq1, seq2 = alignment.align(read1, read2)
         if len(seq) < min_lenth:
             continue
-        qual = cut(seq, record.qual)
-        result.append(Record(name=record.name, seq=seq, qual=qual, seq1=seq1, seq2=seq2))
-    return result
+        c_seq,c_q=correct_seq(seq, seq1, seq2, record.qual)
 
+        result.append(Record(name=record.name, seq=c_seq.replace('-', 'N'), qual=c_q, seq1=seq1.replace('-', 'N'), seq2=seq2.replace('-', 'N')))
+    return result
 
 def process_records(buffer, alignment, min_lenth=50, processes=24):
     pool = multiprocessing.Pool(processes=processes)
@@ -39,7 +73,35 @@ def process_records(buffer, alignment, min_lenth=50, processes=24):
     return [record for result in results for record in result]
 
 
-def cache_and_process(input_file1, input_file2, output_file, alignment, min_lenth=50, processes=24, chunk_size=1000000):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def cache_and_process(input_file1, input_file2, output_file, alignment, min_lenth=50, processes=24, chunk_size=10000000):
     # 获取output_file所在的目录
     output_dir = os.path.dirname(output_file)
 
@@ -48,24 +110,28 @@ def cache_and_process(input_file1, input_file2, output_file, alignment, min_lent
     cut_f2_path = os.path.join(output_dir, output_file[:-2]+'cut_f2.fq')
     report_n1 = 0
     if input_file1.endswith('.gz'):
-        in_handle = gzip.open(input_file1, "rt")
+        in_handle1 = gzip.open(input_file1, "rt")
     else:
-        in_handle = open(input_file1)
+        in_handle1 = open(input_file1)
     if input_file2.endswith('.gz'):
         in_handle2 = gzip.open(input_file2, "rt")
     else:
         in_handle2 = open(input_file2)
-    with in_handle, in_handle2, open(output_file, "w") as out_handle, open(cut_f1_path, "w") as f1, open(cut_f2_path, "w") as f2:
+
+    with in_handle1, in_handle2, open(output_file, "w") as out_handle, open(cut_f1_path, "w") as f1, open(cut_f2_path, "w") as f2:
+
+
         buffer = []
-        for line_num, (line1, line2) in enumerate(zip(in_handle, in_handle2)):
+        for line_num, (line1, line2) in enumerate(zip(in_handle1, in_handle2)):
             if line_num % 4 == 0:
                 record_name1 = line1.strip().split()[0]
             elif line_num % 4 == 1:
                 record_seq = line1.strip() + " " + line2.strip()
             elif line_num % 4 == 3:
                 record_qual1 = line1.strip()
-                buffer.append(Record(name=record_name1, seq=record_seq, qual=record_qual1, seq1=line1.strip(),
-                                     seq2=line2.strip()))
+                record_qual2 = line2.strip()
+                buffer.append(Record(name=record_name1, seq=record_seq, qual=record_qual1+" "+record_qual2, seq1="nothing",
+                                     seq2="nothing"))
             if len(buffer) == chunk_size:
                 print("process reads : " + str(int((line_num + 1) / 4)))
                 temp = process_records(buffer, alignment, min_lenth, processes)
@@ -74,15 +140,15 @@ def cache_and_process(input_file1, input_file2, output_file, alignment, min_lent
                     out_handle.write(f"{seq.name}\n")
                     out_handle.write(f"{seq.seq}\n")
                     out_handle.write(f"+\n")
-                    out_handle.write(f"{seq.qual}\n")
+                    out_handle.write(f"{seq.qual.split()[0]}\n")
                     f1.write(f"{seq.name}\n")
                     f1.write(f"{seq.seq1}\n")
                     f1.write(f"+\n")
-                    f1.write(f"{seq.qual}\n")
+                    f1.write(f"{seq.qual.split()[1]}\n")
                     f2.write(f"{seq.name}\n")
                     f2.write(f"{seq.seq2}\n")
                     f2.write(f"+\n")
-                    f2.write(f"{seq.qual}\n")
+                    f2.write(f"{seq.qual.split()[2]}\n")
                 buffer = []
         if buffer:
             temp = process_records(buffer, alignment, min_lenth, processes)
@@ -91,19 +157,34 @@ def cache_and_process(input_file1, input_file2, output_file, alignment, min_lent
                 out_handle.write(f"{seq.name}\n")
                 out_handle.write(f"{seq.seq}\n")
                 out_handle.write(f"+\n")
-                out_handle.write(f"{seq.qual}\n")
+                out_handle.write(f"{seq.qual.split()[0]}\n")
                 f1.write(f"{seq.name}\n")
                 f1.write(f"{seq.seq1}\n")
                 f1.write(f"+\n")
-                f1.write(f"{seq.qual}\n")
+                f1.write(f"{seq.qual.split()[1]}\n")
                 f2.write(f"{seq.name}\n")
                 f2.write(f"{seq.seq2}\n")
                 f2.write(f"+\n")
-                f2.write(f"{seq.qual}\n")
-    in_handle.close()
-    in_handle2.close()
+                f2.write(f"{seq.qual.split()[2]}\n")
+
+
+
     message = "fq1: " + input_file1 + "\n" + "fq2: " + input_file2 + "\n" + "min_read_length: " + str(
         min_lenth) + "\n" + "input_reads: " + str(int((line_num + 1) / 4)) + "\n" + "resolved_reads: " + str(
         report_n1) + "\n" + "resolved ratio: " + str("{:.2f}%".format(report_n1 / int((line_num + 1) / 4) * 100))
     print(message)
     return message
+
+
+
+
+
+
+
+
+
+
+
+
+
+
