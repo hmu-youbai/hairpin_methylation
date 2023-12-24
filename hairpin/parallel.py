@@ -101,7 +101,7 @@ def process_records(buffer, alignment, min_lenth=50, processes=24):
 
 
 
-def cache_and_process(input_file1, input_file2, output_file, alignment, min_lenth=50, processes=24, chunk_size=10000000):
+def cache_and_process(input_file1, input_file2, output_file, alignment, min_lenth=50, processes=24, chunk_size=1000000):
     # 获取output_file所在的目录
     output_dir = os.path.dirname(output_file)
 
